@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import {  createUserWithEmailAndPassword  } from 'firebase/auth';
 import { auth } from '../firebase';
+import GoogleSignInButton from './GoogleSignInButton';
 
 const Signup = () => {
     const navigate = useNavigate();
@@ -74,6 +75,8 @@ const Signup = () => {
 
                     </form>
 
+                    <GoogleSignInButton />
+                    
                     <p>
                         Already have an account?{' '}
                         <NavLink to="/login" >
