@@ -1,93 +1,91 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import {  createUserWithEmailAndPassword  } from 'firebase/auth';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../firebase';
-import GoogleSignInButton from './GoogleSignInButton';
+import GoogleSignInButton from '../components/GoogleSignInButton';
 
 const Signup = () => {
     const navigate = useNavigate();
-
-    const [email, setEmail] = useState('')
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
     const onSubmit = async (e) => {
-      e.preventDefault()
-
-      await createUserWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-            // Signed in
-            const user = userCredential.user;
-            console.log(user);
-            navigate("/login")
-            // ...
-        })
-        .catch((error) => {
-            const errorCode = error.code;
-            const errorMessage = error.message;
-            console.log(errorCode, errorMessage);
-            // ..
-        });
-
-
+        e.preventDefault();
+        await createUserWithEmailAndPassword(auth, email, password)
+            .then((userCredential) => {
+                const user = userCredential.user;
+                console.log(user);
+                navigate("/login");
+            })
+            .catch((error) => {
+                const errorCode = error.code;
+                const errorMessage = error.message;
+                console.log(errorCode, errorMessage);
+            });
     }
 
-  return (
-    <main >        
-        <section>
-            <div>
-                <div>                  
-                    <h1> Air Notes </h1>                                                                            
-                    <form>                                                                                            
-                        <div>
-                            <label htmlFor="email-address">
+    return (
+        <main className="flex bg-custom-gradient items-center justify-center min-h-screen">
+            <section className="w-full max-w-md p-6 bg-white rounded-lg shadow-md">
+                <div>
+                    <h1 className="text-2xl font-bold text-center text-deep-purple mb-6"> Implement App </h1> 
+                    <form onSubmit={onSubmit}>
+                        <div className="mb-4">
+                            <label htmlFor="email-address" className="block text-sm font-medium text-deep-purple">
                                 Email address
                             </label>
                             <input
+                                id="email-address"
+                                name="email"
                                 type="email"
-                                label="Email address"
                                 value={email}
-                                onChange={(e) => setEmail(e.target.value)}  
-                                required                                    
-                                placeholder="Email address"                                
+                                onChange={(e) => setEmail(e.target.value)}
+                                required
+                                placeholder="Email address"
+                                className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-neon-pink focus:border-neon-pink sm:text-sm"
                             />
                         </div>
 
-                        <div>
-                            <label htmlFor="password">
+                        <div className="mb-6">
+                            <label htmlFor="password" className="block text-sm font-medium text-deep-purple">
                                 Password
                             </label>
                             <input
+                                id="password"
+                                name="password"
                                 type="password"
-                                label="Create password"
                                 value={password}
-                                onChange={(e) => setPassword(e.target.value)} 
-                                required                                 
-                                placeholder="Password"              
+                                onChange={(e) => setPassword(e.target.value)}
+                                required
+                                placeholder="Password"
+                                className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-neon-pink focus:border-neon-pink sm:text-sm"
                             />
-                        </div>                                             
-
-                        <button
-                            type="submit" 
-                            onClick={onSubmit}                        
-                        >  
-                            Sign up                                
-                        </button>
-
+                        </div>
+                        <div className="mb-4">
+                            <button
+                                type="submit"
+                                className="w-full py-2 px-4 bg-deep-purple text-white font-bold rounded-md hover:bg-neon-pink focus:outline-none focus:bg-neon-pink"
+                            >
+                                Sign up
+                            </button>
+                        </div>
+                        
                     </form>
 
-                    <GoogleSignInButton />
-                    
-                    <p>
+                    <div className="flex items-center justify-center">
+                        <GoogleSignInButton />
+                    </div>
+
+                    <p className="p-4 flex items-center justify-center text-sm text-center text-deep-purple">
                         Already have an account?{' '}
-                        <NavLink to="/login" >
-                            Sign in
+                        <NavLink to="/login" className="font-medium text-neon-pink hover:text-deep-purple">
+                        &nbsp;Sign in
                         </NavLink>
-                    </p>                   
+                    </p>
                 </div>
-            </div>
-        </section>
-    </main>
-  )
+            </section>
+        </main>
+    );
 }
 
 export default Signup;
