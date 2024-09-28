@@ -50,20 +50,37 @@ class response():
 
         # Agent Node Prompts
         self.PLAN_PROMPT = ("""
+                            You are an expert academic assistant tasked with creating a high-level outline for a new set of notes. Use the existing study notes and provided\
+                            topics to guide the structure of the new notes. Your outline should serve as a foundation to build a more comprehensive version, incorporating the\
+                            current content while suggesting areas for further elaboration and expansion, maintaining a focus on the original subject matter
                             """)
         
         self.WRITER_PROMPT = ("""
+                            You are a skilled academic assistant tasked with writing excellent notes.\
+                            Your goal is to improve and refine the user's study notes and initial outline by\
+                            adding detailed explanations, breaking down complex concepts, and suggesting relevant examples.\
+                            Ensure that the notes are clear, concise, and easy to understand, while maintaining a focus on\
+                            the original subject matter. Utilize all the information provided below as needed.
+                              
                             ------
                             {content}
                             """)
         
         self.RESEARCH_PLAN_PROMPT = ("""
-                            """)
+                                    You are a researcher charged with providing information that can be used when creating\
+                                    notes for the following topics. Generate a list of search queries that will gather any relevant\
+                                    information. Only generate 2 queries max.
+                                    """)
 
         self.REFLECTION_PROMPT = ("""
+                                You are a teacher grading notes based on accuracy, comprehensiveness, and structure.\
+                                Generate critique and recommendations for the user's notes.
                                 """)
 
         self.RESEARCH_CRITIQUE_PROMPT = ("""
+                                        You are a researcher charged with providing information that can be used when making\
+                                        any requested revisions (as outlined below). Generate a list of search queries that will\
+                                        gather any relevant information. Only generate 2 queries max.
                                         """)
         
         # Tavily API Call
