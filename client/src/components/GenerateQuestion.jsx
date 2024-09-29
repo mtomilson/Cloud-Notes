@@ -2,20 +2,12 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { firestore, auth } from "../firebase";
 import { collection, query, orderBy, limit, getDocs } from "firebase/firestore";
-
-let question = "";
-let answer = "";
-
-export const setQuestionAndAnswer = (newQuestion, newAnswer) => {
-    question = newQuestion;
-    answer = newAnswer;
-  };
+import { useQuestionContext } from "./QuestionContext";
 
 export default function GenerateQuestion() {
+  const { question, answer, setQuestionAndAnswer } = useQuestionContext();
   const [loading, setLoading] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
-//   const [question, setQuestion] = useState(""); // Store question separately
-//   const [answer, setAnswer] = useState(""); // Store answer separately
 
   useEffect(() => {
     const unsubscribeAuth = auth.onAuthStateChanged((user) => {
@@ -59,7 +51,8 @@ export default function GenerateQuestion() {
           withCredentials: true,
         }
       );
-      console.log(res.data.problems.question + " " + res.data.problems.answer)
+
+      console.log("Question:", res.data.problems.question, "Answer:", res.data.problems.answer);
       setQuestionAndAnswer(res.data.problems.question, res.data.problems.answer);
     } catch (error) {
       console.error("Error generating problems:", error);
@@ -70,9 +63,7 @@ export default function GenerateQuestion() {
 
   return (
     <div className="bg-white border border-gray-300 rounded-lg p-4 shadow-md">
-      <h2 className="text-lg font-semibold mb-2 text-gray-800">
-        Practice Problems
-      </h2>
+      <h2 className="text-lg font-semibold mb-2 text-gray-800">Practice Problems</h2>
       <button
         onClick={generateProblems}
         className="bg-green-500 text-white p-2 rounded hover:bg-green-600 transition mb-4"
@@ -80,9 +71,10 @@ export default function GenerateQuestion() {
       >
         {loading ? "Generating..." : "Generate Problems"}
       </button>
+      {/* <div>
+        <strong>Question:</strong> {question} <br />
+        <strong>Answer:</strong> {answer}
+      </div> */}
     </div>
   );
 }
-
-export const getQuestion = () => question;
-export const getAnswer = () => answer;

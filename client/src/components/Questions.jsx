@@ -1,6 +1,14 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useQuestionContext } from "./QuestionContext";
 
 const Questions = ({ canvasRef }) => {
+
+  const { question, answer } = useQuestionContext();
+
+  useEffect(() => {
+    console.log("GOAL QUESTION: " + question)
+    console.log("GOAL ANSWER: " + answer);
+  }, [])
     const saveCanvas = () => {
         const canvas = canvasRef.current;
         const image = canvas.toDataURL("image/png");
@@ -12,7 +20,7 @@ const Questions = ({ canvasRef }) => {
     <h1
       style={{
         position: 'absolute',
-        bottom: '0',
+        // bottom: '0',
         width: '100%',
         zIndex: 9999, // Ensure it's on top
         backgroundColor: 'rgba(0, 0, 0, 0.8)', // Semi-transparent background
@@ -24,7 +32,7 @@ const Questions = ({ canvasRef }) => {
         margin: '0', // Remove default margin
       }}
     >
-      QUESTIOSNTOENTSNTNSEOTNSITEOTN
+      {question}
     </h1>
     
      <button style={{
