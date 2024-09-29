@@ -106,6 +106,16 @@ export default function AgentChat() {
         userId: user.uid
       });
 
+      if (currentUser && currentUser.uid) {
+        const collectionRef = collection(firestore, currentUser.uid);
+        await addDoc(collectionRef, {
+            draft: generateResult.draft,
+            task: task,
+            timestamp: new Date()
+          });
+      } else {
+        console.log("User is not authenticated or UID is not available");
+      }
     } catch (error) {
       console.error("Error sending message: ", error);
     } finally {
