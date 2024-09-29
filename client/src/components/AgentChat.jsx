@@ -3,6 +3,7 @@ import axios from 'axios';
 import useFirebaseData from './useFirebaseData';
 import { firestore, auth } from '../firebase';
 import { addDoc, collection } from "firebase/firestore";
+import ReactMarkdown from 'react-markdown'
 
 export default function AgentChat() {
   const [loading, setLoading] = useState(false);
@@ -47,7 +48,7 @@ export default function AgentChat() {
 
       if (currentUser && currentUser.uid) {
         const collectionRef = collection(firestore, currentUser.uid);
-        await addDoc(collectionRef, { tset: "test" });
+        await addDoc(collectionRef, { test: "test" });
       } else {
         console.log("User is not authenticated or UID is not available");
       }
@@ -78,7 +79,7 @@ export default function AgentChat() {
         </button>
       </form>
       <div className="h-48 overflow-y-auto border border-gray-300 rounded-lg p-2 mb-2 bg-gray-50">
-        {response && <p className="text-gray-800">{response}</p>}
+        {response && <ReactMarkdown className="text-gray-800">{response}</ReactMarkdown>}
         <ul>
           {data.map((item, index) => (
             <li key={index} className="text-gray-700">{item.draft}</li>
