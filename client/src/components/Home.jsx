@@ -43,35 +43,16 @@ const Home = () => {
     };
 
     return (
-        <div className="flex h-screen bg-gray-100">
-            {/* Sidebar */}
-            <aside className="w-64 bg-gray-800 text-white p-6">
-                <h1 className="text-2xl font-bold mb-6">File Manager</h1>
-                <nav className="flex-grow overflow-y-auto mb-6">
-                    <ul>
-                        {notes.map(note => (
-                            <li 
-                                key={note.id} 
-                                className="p-2 hover:bg-gray-700 cursor-pointer rounded"
-                                onClick={() => handleNoteClick(note)}
-                            >
-                                {note.name}
-                            </li>
-                        ))}
-                    </ul>
-                </nav>
-                <button
-                    onClick={handleLogout}
-                    className="w-full p-2 bg-red-500 text-white rounded hover:bg-red-600 transition"
-                >
-                    Logout
-                </button>
-            </aside>
+        <div className="flex bg-custom-gradient h-full w-full flex flex-col">
+            {/* Title */}
+            <header className="flex justify-between items-center p-4 text-white shadow-md">
+                <h1 className="text-3xl font-semibold">Cloud Notes</h1>
+                <img src="./hackUMBCTextShadow.png" alt="Logo" className="h-12" /> {/* Replace with your image path */}
+            </header>
 
             {/* Main Content */}
-            <main className="flex-1 flex flex-col p-6">
+            <main className="flex-1 flex flex-col p-10">
                 <div className="flex-1 flex flex-col">
-                    <h1 className="text-2xl font-semibold mb-4">AI Assistant</h1>
                     <div className="flex-1 bg-white rounded-lg shadow-lg overflow-hidden flex flex-col">
                         <div className="flex-1 overflow-y-auto p-4">
                             <AgentChat />
@@ -80,8 +61,14 @@ const Home = () => {
                 </div>
 
                 {/* Footer */}
-                <footer className="mt-4 text-center text-gray-500">
-                    <p>&copy; {new Date().getFullYear()} hackumbc picture lol.</p>
+                <footer className="flex justify-between items-center mt-4 text-gray-500">
+                    <img src="./hackLogo24.png" alt="Logo" className="h-8" /> {/* Replace with your image path */}
+                    <button 
+                        onClick={handleLogout} 
+                        className="bg-red-500 text-white p-2 rounded hover:bg-red-600 transition"
+                    >
+                        Logout
+                    </button>
                 </footer>
             </main>
         </div>
