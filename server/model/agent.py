@@ -6,6 +6,9 @@ from langchain_core.messages import SystemMessage, HumanMessage
 from langchain_openai import ChatOpenAI
 from pydantic import BaseModel
 from tavily import TavilyClient
+from flask import Flask, jsonify, request
+from flask_cors import CORS
+import json
 import os
 import operator
 import sqlite3
@@ -199,30 +202,30 @@ class response():
             return END
         return "reflect" 
 
-# Main Function
-def main():
-    # Initialize the agent response model
-    agent = response()
-    
-    # Define the initial state with an example task
-    initial_state = {
-        'task': "Plan a study guide for linear algebra",
-        'plan': '',
-        'draft': '',
-        'critique': '',
-        'content': [],
-        'queries': [],
-        'revision_number': 1,
-        'max_revisions': 2,
-        'lnode': '',
-        'count': 0
-    }
+app = Flask(__name__)
+CORS(app, resources={r"/api/*": {"origins": "http://localhost:5173", "supports_credentials": True}})
 
-    # Use the graph's stream method to execute the model
-    print("Executing the agent model...")
-    for output in agent.graph.stream(initial_state, thread):
-        print(output)
+response_instance = response()
 
-# Execute the main function
+@app.route("/api/note-response", methods=['GET', 'POST'])
+def get_noyr_response():
+    task = 'Generate notes for me in linear alg'
+
+    print(request.data)
+    if request.method == 'POST':
+        input = request.data.decode('utf-8')
+        task = json.loads(input)["task"]
+
+    result = []
+    for s in response_instance.graph.stream({
+    'task': task,
+    'max_revisions': 2,
+    'revision_number': 1,
+    }, thread):
+        print(s)
+        result.append(s)
+    return jsonify(result)
+
 if __name__ == "__main__":
-    main()
+    app.run(debug=True, port=8080)
+

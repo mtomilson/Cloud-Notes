@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "axios": "^1.7.7",
     "firebase": "^10.13.2",
     "firebaseui": "^6.1.0",
     "react": "^18.3.1",
