@@ -20,7 +20,7 @@ const GoogleSignInButton = () => {
     return (
         <button
             onClick={signInWithGoogle}
-            className="flex items-center justify-center w-full px-4 py-2 text-white bg-deep-purple rounded-lg shadow-md hover:bg-neon-pink focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition duration-200"
+            className="flex items-center justify-center w-full px-4 py-2 text-white bg-green-purple-gradient rounded-lg shadow-md hover:bg-pink-purple-gradient focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition duration-200"
         >
             <svg
                 className="w-5 h-5 mr-2"

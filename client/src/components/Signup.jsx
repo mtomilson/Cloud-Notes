@@ -25,7 +25,7 @@ const Signup = () => {
     }
 
     return (
-        <main className="flex bg-green-purple-gradient items-center justify-center min-h-screen">
+        <main className="flex bg-custom-gradient items-center justify-center min-h-screen">
             <section className="w-full max-w-md p-6 bg-white rounded-lg shadow-md">
                 <div>
                     <h1 className="text-2xl font-bold text-center text-deep-purple mb-6"> Implement App </h1> 
@@ -64,7 +64,7 @@ const Signup = () => {
                         <div className="mb-4">
                             <button
                                 type="submit"
-                                className="w-full py-2 px-4 bg-deep-purple text-white font-bold rounded-md hover:bg-neon-pink focus:outline-none focus:bg-blue-pink-gradient"
+                                className="w-full py-2 px-4 bg-green-purple-gradient text-white font-bold rounded-md hover:bg-pink-purple-gradient focus:outline-none focus:bg-blue-pink-gradient"
                             >
                                 Sign up
                             </button>
