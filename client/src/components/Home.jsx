@@ -57,9 +57,9 @@ const Home = () => {
                     userId: userId,
                     uploadedAt: new Date()
                 });
-                console.log(`File ${file.name} uploaded successfully.`);
+                console.log("File ${file.name} uploaded successfully.");
             } catch (error) {
-                console.error(`Error uploading file ${file.name}: `, error);
+                console.error("Error uploading file ${file.name}:", error);
             }
         }
 
@@ -88,17 +88,12 @@ const Home = () => {
                     </button>
                 </div>
                 <div>
-                    <input
-                        type="file"
-                        onChange={handleFileUpload}
+                    <button
+                        onClick={handleFileUpload}
                         className="absolute inset-x-0 bottom-10 p-2 hover:bg-gray-700 cursor-pointer"
-                        multiple
-                        style={{ display: 'none' }}
-                        id="file-upload"
-                    />
-                    <label htmlFor="file-upload" className="text-center absolute inset-x-0 bottom-10 p-2 hover:bg-gray-700 cursor-pointer">
-                        Upload Files
-                    </label>
+                    >
+                        New File
+                    </button>
                 </div>
                 <div>
                     <button
