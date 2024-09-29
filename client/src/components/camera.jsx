@@ -17,7 +17,7 @@ const App = () => {
     const startCamera = async () => {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
-          video: { width: 1400, height: 800 },
+          video: { width: 1920, height: 1080 },
         });
         videoRef.current.srcObject = stream;
 
