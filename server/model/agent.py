@@ -13,6 +13,11 @@ import os
 import operator
 import sqlite3
 import uuid
+from werkzeug.utils import secure_filename
+import PyPDF2
+import docx
+import speech_recognition as sr
+from pydub import AudioSegment
 
 
 # Initialize dotenv to load environment variables
@@ -206,6 +211,78 @@ app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": "http://localhost:5173", "supports_credentials": True}})
 
 response_instance = response()
+UPLOAD_FOLDER = 'temp_uploads'
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
+
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+def extract_text_from_pdf(file_path):
+    with open(file_path, 'rb') as file:
+        reader = PyPDF2.PdfReader(file)
+        text = ""
+        for page in reader.pages:
+            text += page.extract_text() + "\n"
+    return text
+
+def extract_text_from_docx(file_path):
+    doc = docx.Document(file_path)
+    text = ""
+    for para in doc.paragraphs:
+        text += para.text + "\n"
+    return text
+
+def extract_text_from_audio(file_path):
+    r = sr.Recognizer()
+    
+    # Convert audio to WAV format
+    audio = AudioSegment.from_file(file_path)
+    wav_path = file_path + ".wav"
+    audio.export(wav_path, format="wav")
+    
+    with sr.AudioFile(wav_path) as source:
+        audio_data = r.record(source)
+        text = r.recognize_google(audio_data)
+    
+    os.remove(wav_path)  # Clean up temporary WAV file
+    return text
+
+@app.route("/api/convert-files", methods=['POST'])
+def convert_files():
+    if 'file0' not in request.files:
+        return jsonify({"error": "No file part"}), 400
+    
+    files = request.files.to_dict(flat=False)
+    converted_texts = []
+
+    for file_key in files:
+        file = files[file_key][0]
+        if file.filename == '':
+            continue
+        
+        if file:
+            filename = secure_filename(file.filename)
+            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            file.save(file_path)
+            
+            try:
+                if file.content_type == 'application/pdf':
+                    text = extract_text_from_pdf(file_path)
+                elif file.content_type in ['application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document']:
+                    text = extract_text_from_docx(file_path)
+                elif file.content_type.startswith('audio/'):
+                    text = extract_text_from_audio(file_path)
+                else:
+                    with open(file_path, 'r') as f:
+                        text = f.read()
+                
+                converted_texts.append(f"[Content of {filename}]:\n{text}")
+            except Exception as e:
+                print(f"[Error processing {filename}]: {str(e)}")
+            finally:
+                os.remove(file_path)  # Clean up the uploaded file
+
+    return jsonify(converted_texts)
 
 @app.route("/api/note-response", methods=['GET', 'POST'])
 def get_noyr_response():
@@ -224,7 +301,9 @@ def get_noyr_response():
     }, thread):
         print(s)
         result.append(s)
-    return jsonify(result)
+        answer = jsonify(result)
+        print(answer)
+    return answer
 
 if __name__ == "__main__":
     app.run(debug=True, port=8080)
