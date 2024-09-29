@@ -3,6 +3,7 @@ import axios from 'axios';
 import useFirebaseData from './useFirebaseData';
 import { firestore, auth } from '../firebase';
 import { addDoc, collection } from "firebase/firestore";
+import ReactMarkdown from 'react-markdown'
 
 export default function AgentChat() {
   const [loading, setLoading] = useState(false);
@@ -47,7 +48,7 @@ export default function AgentChat() {
 
       if (currentUser && currentUser.uid) {
         const collectionRef = collection(firestore, currentUser.uid);
-        await addDoc(collectionRef, {tset: "test"});
+        await addDoc(collectionRef, { test: "test" });
       } else {
         console.log("User is not authenticated or UID is not available");
       }
@@ -59,25 +60,32 @@ export default function AgentChat() {
   };
 
   return (
-    <>
-      <div className='border border-black p-4'>
-        <h1 className='bg-red-500 text-white p-2'>Hello</h1>
-        <form onSubmit={handleSubmit} className='border border-black text-black mt-4 p-2'>
-          <input
-            type="text"
-            value={task}
-            onChange={handleInputChange}
-            placeholder='Enter Notes or Question here'
-            className='border border-gray-300 p-2 rounded w-full'
-          />
-        </form>
-        {response}
+    <div className="bg-white border border-gray-300 rounded-lg p-4 shadow-md">
+      <h1 className="text-lg font-semibold mb-2 text-gray-800">Chat with Agent</h1>
+      <form onSubmit={handleSubmit} className="flex items-center mb-2">
+        <input
+          type="text"
+          value={task}
+          onChange={handleInputChange}
+          placeholder='Enter your question here'
+          className='border border-gray-300 p-2 rounded flex-grow mr-2'
+        />
+        <button
+          type="submit"
+          className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition"
+          disabled={loading}
+        >
+          {loading ? 'Sending...' : 'Send'}
+        </button>
+      </form>
+      <div className="h-48 overflow-y-auto border border-gray-300 rounded-lg p-2 mb-2 bg-gray-50">
+        {response && <ReactMarkdown className="text-gray-800">{response}</ReactMarkdown>}
         <ul>
           {data.map((item, index) => (
-            <li key={index}>{item.draft}</li>
+            <li key={index} className="text-gray-700">{item.draft}</li>
           ))}
         </ul>
       </div>
-    </>
+    </div>
   );
 }
