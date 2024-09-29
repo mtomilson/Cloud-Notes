@@ -1,39 +1,89 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import useFirebaseData from './useFirebaseData';
 import { firestore, auth } from '../firebase';
-import { addDoc, collection } from "firebase/firestore";
-import ReactMarkdown from 'react-markdown'
+import { addDoc, collection, query, orderBy, onSnapshot } from "firebase/firestore";
+import ReactMarkdown from 'react-markdown';
 
 export default function AgentChat() {
   const [loading, setLoading] = useState(false);
-  const [task, setTask] = useState("");
-  const [response, setResponse] = useState([]);
-  const data = useFirebaseData();
-  const [currentUser, setCurrentUser] = useState(null);
+  const [message, setMessage] = useState("");
+  const [chatHistory, setChatHistory] = useState([]);
+  const [files, setFiles] = useState([]);
+  const [conversionResponse, setConversionResponse] = useState([]);
+  const chatEndRef = useRef(null);
 
   useEffect(() => {
-    const unsubscribeAuth = auth.onAuthStateChanged((user) => {
-      if (user) {
-        setCurrentUser(user);
-      }
-    });
-    return () => unsubscribeAuth();
+    const user = auth.currentUser;
+    if (user) {
+      const messagesRef = collection(firestore, user.uid);
+      const q = query(
+        messagesRef,
+        orderBy("timestamp", "asc")
+      );
+
+      const unsubscribe = onSnapshot(q, (snapshot) => {
+        const messages = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setChatHistory(messages);
+      });
+
+      return () => unsubscribe();
+    }
   }, []);
 
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [chatHistory]);
+
   const handleInputChange = (e) => {
-    setTask(e.target.value);
+    setMessage(e.target.value);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setResponse([]);
+    if (!message.trim() && files.length === 0) return;
+
     setLoading(true);
 
     try {
+      const user = auth.currentUser;
+      
+      let combinedMessage = message;
+
+      if (files.length > 0) {
+        const formData = new FormData();
+        files.forEach((file, index) => {
+          formData.append(`file${index}`, file);
+        });
+
+        const fileConversionResponse = await axios.post(
+          "http://localhost:8080/api/convert-files",
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+            withCredentials: true,
+          }
+        );
+
+        combinedMessage += "\n\n" + fileConversionResponse.data.join("\n\n");
+      }
+
+      setMessage("");
+      setFiles([]);
+
+      // Add user message to Firestore
+      await addDoc(collection(firestore, user.uid), {
+        content: message,
+        sender: 'user',
+        timestamp: new Date(),
+        userId: user.uid
+      });
+
+      // Send message to backend
       const res = await axios.post(
         "http://localhost:8080/api/note-response",
-        { task },
+        { task: combinedMessage },
         {
           headers: {
             "Content-Type": "application/json",
@@ -42,12 +92,22 @@ export default function AgentChat() {
         }
       );
 
-      const generateResult = res.data.find((item) => item.generate)?.generate;
-      console.log("Data received: ", generateResult);
-      setResponse(generateResult.draft);
+      console.log(res.data);
 
-      if (currentUser && currentUser.uid) {
-        const collectionRef = collection(firestore, currentUser.uid);
+      // Process the response
+      const aiResponse = res.data.find((item) => item.generate)?.generate;
+      setConversionResponse(aiResponse.draft);
+
+      // Add AI response to Firestore
+      await addDoc(collection(firestore, user.uid), {
+        content: aiResponse.draft,
+        sender: 'ai',
+        timestamp: new Date(),
+        userId: user.uid
+      });
+
+      if (user && user.uid) {
+        const collectionRef = collection(firestore, user.uid);
         await addDoc(collectionRef, {
             draft: generateResult.draft,
             task: task,
@@ -57,39 +117,90 @@ export default function AgentChat() {
         console.log("User is not authenticated or UID is not available");
       }
     } catch (error) {
-      console.error("Error sending request to server: ", error);
+      console.error("Error sending message: ", error);
     } finally {
       setLoading(false);
     }
   };
 
+  const handleFileUpload = (event) => {
+    const selectedFiles = Array.from(event.target.files);
+    const validFileTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain', 'audio/*'];
+    
+    const filteredFiles = selectedFiles.filter(file => 
+      validFileTypes.some(type => file.type.match(type))
+    );
+    
+    if (filteredFiles.length > 5) {
+      alert("You can only upload a maximum of 5 files.");
+      setFiles(filteredFiles.slice(0, 5));
+    } else {
+      setFiles(prevFiles => [...prevFiles, ...filteredFiles].slice(0, 5));
+    }
+  };
+
+  const removeFile = (index) => {
+    setFiles(prevFiles => prevFiles.filter((_, i) => i !== index));
+  };
+
   return (
-    <div className="bg-white border border-gray-300 rounded-lg p-4 shadow-md">
-      <h1 className="text-lg font-semibold mb-2 text-gray-800">Chat with Agent</h1>
-      <form onSubmit={handleSubmit} className="flex items-center mb-2">
-        <input
-          type="text"
-          value={task}
-          onChange={handleInputChange}
-          placeholder='Enter your question here'
-          className='border border-gray-300 p-2 rounded flex-grow mr-2'
-        />
-        <button
-          type="submit"
-          className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition"
-          disabled={loading}
-        >
-          {loading ? 'Sending...' : 'Send'}
-        </button>
-      </form>
-      <div className="h-48 overflow-y-auto border border-gray-300 rounded-lg p-2 mb-2 bg-gray-50">
-        {response && <ReactMarkdown className="text-gray-800">{response}</ReactMarkdown>}
-        <ul>
-          {data.map((item, index) => (
-            <li key={index} className="text-gray-700">{item.draft}</li>
+    <div className="flex flex-col h-full">
+      <div className="flex-grow overflow-y-auto" style={{ maxHeight: '80vh' }}> {/* Set max height */}
+        <div className="space-y-4 p-4">
+          {chatHistory.map((msg) => (
+            <div key={msg.id} className={`p-3 rounded-lg ${msg.sender === 'user' ? 'bg-blue-100 ml-auto' : 'bg-gray-100'} max-w-3/4`}>
+              {typeof msg.content === 'string' ? (
+                <ReactMarkdown className="text-sm text-gray-800">{msg.content}</ReactMarkdown>
+              ) : (
+                <div className="text-sm text-gray-800">Invalid message format</div>
+              )}
+            </div>
           ))}
-        </ul>
+          <div ref={chatEndRef} />
+        </div>
       </div>
+      <form onSubmit={handleSubmit} className="p-4 border-t border-gray-200 bg-white">
+        <div className="mb-2">
+          {files.map((file, index) => (
+            <div key={index} className="flex items-center mb-1 text-sm">
+              <span className="mr-2">{file.name}</span>
+              <button 
+                type="button"
+                onClick={() => removeFile(index)}
+                className="text-red-500 hover:text-red-700"
+              >
+                {/* You can add an icon or text here */}
+                🗑️
+              </button>
+            </div>
+          ))}
+        </div>
+        <div className="flex items-center">
+          <input
+            type="text"
+            value={message}
+            onChange={handleInputChange}
+            placeholder="Type your message..."
+            className="flex-grow p-2 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+          />
+          <label className="cursor-pointer bg-gray-200 p-2 border border-gray-300 hover:bg-gray-300 transition">
+            <input
+              type="file"
+              onChange={handleFileUpload}
+              className="hidden"
+              multiple
+            />
+            📎
+          </label>
+          <button
+            type="submit"
+            className="bg-blue-500 text-white p-2 rounded-r-lg hover:bg-blue-600 transition text-sm"
+            disabled={loading}
+          >
+            {loading ? 'Sending...' : 'Send'}
+          </button>
+        </div>
+      </form>
     </div>
   );
 }
