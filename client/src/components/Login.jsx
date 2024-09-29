@@ -60,7 +60,7 @@ const Login = () => {
                             </div>
 
                             <div className="mb-4">
-                                <button onClick={onLogin} className="w-full py-2 px-4 bg-deep-purple text-white font-bold rounded-md hover:bg-neon-pink focus:outline-none focus:bg-neon-pink">      
+                                <button onClick={onLogin} className="w-full py-2 px-4 bg-green-purple-gradient text-white font-bold rounded-md hover:bg-pink-purple-gradient focus:outline-none focus:bg-neon-pink">      
                                     Login                                                                  
                                 </button>
                             </div>                               
