@@ -7,7 +7,7 @@ const NavBar = () => (
       <div className="flex items-center justify-between h-16">
         <div className="flex-shrink-0">
           <Link to="/" className="flex items-center">
-            <span className="ml-2 text-2xl font-bold text-beige">Implement</span>
+            <span className="ml-2 text-2xl font-bold text-beige">Cloud Notes</span>
           </Link>
         </div>
         <div className="flex items-center">
@@ -39,10 +39,10 @@ const LandingPage = () => {
         <div className="max-w-7xl mx-auto">
           <header className="text-center mb-12">
             <h1 className="pt-4 text-4xl sm:text-5xl font-extrabold text-beige mb-4">
-              Welcome to Implement
+              Welcome to Cloud Notes
             </h1>
             <p className="text-xl text-sand">
-              Boost your productivity with our futuristic task management solution
+              Boost your productivity with our innovative note management solution
             </p>
           </header>
           
