@@ -34,9 +34,9 @@ function App() {
           path="/home" 
           element={
             <ProtectedRoute>
-              <Home />
-              {/* <AgentChat />
-              <GenerateQuestion /> */}
+              {/* <Home /> */}
+              <AgentChat />
+              <GenerateQuestion />
             </ProtectedRoute>
           } 
         />

@@ -7,8 +7,9 @@ import ReactMarkdown from 'react-markdown';
 
 export default function GenerateQuestion() {
   const [loading, setLoading] = useState(false);
-  const [problems, setProblems] = useState([]);
   const [currentUser, setCurrentUser] = useState(null);
+  const [question, setQuestion] = useState(""); // Store question separately
+  const [answer, setAnswer] = useState("");     // Store answer separately
 
   useEffect(() => {
     const unsubscribeAuth = auth.onAuthStateChanged((user) => {
@@ -52,8 +53,11 @@ export default function GenerateQuestion() {
           withCredentials: true,
         }
       );
-
-      setProblems(res.data.problems);
+      console.log(res);
+      setQuestion(res.data.problems.question);
+      setAnswer(res.data.problems.answer);
+      console.log(answer);
+      console.log(question)
     } catch (error) {
       console.error("Error generating problems:", error);
     } finally {
@@ -71,13 +75,15 @@ export default function GenerateQuestion() {
       >
         {loading ? 'Generating...' : 'Generate Problems'}
       </button>
-      <div className="space-y-4">
+      {/* <div className="space-y-4">
         {problems.map((problem, index) => (
           <div key={index} className="border border-gray-200 rounded p-3">
             <ReactMarkdown className="text-gray-800">{problem}</ReactMarkdown>
           </div>
         ))}
-      </div>
+      </div> */}
+      {question}
+      {answer}
     </div>
   );
 }
