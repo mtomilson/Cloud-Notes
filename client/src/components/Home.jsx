@@ -89,12 +89,6 @@ const Home = () => {
         </div>
       </main>
     </div>
-<div className="p-4">
-                  <input type="file" multiple onChange={handleFileUpload} className="hidden" id="fileUpload"/>
-                  <label htmlFor="fileUpload" className="block p-2 bg-gray-700 hover:bg-gray-600 cursor-pointer text-center rounded">
-                      Upload Files
-                  </label>
-              </div>
   );
 };
 
