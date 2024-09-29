@@ -36,19 +36,23 @@ const Questions = ({ canvasRef }) => {
         {hidden? question : answer}
       </h1>
 
-      <button
+      <button 
         style={{
-          position: "absolute",
-          bottom: "0",
-          width: "10%",
-          zIndex: 9999,
-          color: "white", // White text for contrast
-          textAlign: "left", // Center the text
-          padding: "20px", // Padding for spacing
-          fontSize: "24px", // Adjust font size
-          fontWeight: "bold", // Bold text
-          margin: "0",
-        }}
+          position: 'fixed',  // Keep the button stuck to the bottom of the viewport
+          top: '0',        // Align at the bottom
+          left: '180px',          // Align to the left side
+          zIndex: 9999,       // Make sure it's above other elements
+          backgroundColor: '#000',  // Example background color
+          color: 'white',     // White text for contrast
+          textAlign: 'center',
+          padding: '10px 20px', // Padding to make the button look good
+          fontSize: '18px',   // Adjust font size for readability
+          fontWeight: 'bold',
+          margin: '0',
+          border: 'none',     // Remove default button borders
+          borderRadius: '5px', // Optional: round the button corners
+          cursor: 'pointer',
+        }} 
         onClick={checkWork}
       >
         CHECK

@@ -62,19 +62,15 @@ export default function GenerateQuestion() {
   };
 
   return (
-    <div className="bg-white border border-gray-300 rounded-lg p-4 shadow-md">
-      <h2 className="text-lg font-semibold mb-2 text-gray-800">Practice Problems</h2>
+    <div>
       <button
         onClick={generateProblems}
-        className="bg-green-500 text-white p-2 rounded hover:bg-green-600 transition mb-4"
+        className="bg-green-500 text-white p-3 rounded hover:bg-green-600 transition mb-4"
         disabled={loading}
+        style={{position: 'absolute', zIndex: '9999',}}
       >
         {loading ? "Generating..." : "Generate Problems"}
       </button>
-      {/* <div>
-        <strong>Question:</strong> {question} <br />
-        <strong>Answer:</strong> {answer}
-      </div> */}
     </div>
   );
 }
