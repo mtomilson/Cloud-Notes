@@ -27,6 +27,10 @@ export default {
       },
       backgroundImage: {
         'custom-gradient': 'radial-gradient(125% 125% at 50% 10%, #000 40%, #63e 100%)',
+        'pink-purple-gradient': 'linear-gradient(to right, #F72585, #3A0CA3)',
+        'green-purple-gradient': 'linear-gradient(to right, #3A976F, #3A0CA3)',
+        'green-purple-liquid': "url('./public/green-purple-liquid.avif')",
+        // 'custom-image': "url('/path/to/your/image.jpg')"
       },
     },
   },
