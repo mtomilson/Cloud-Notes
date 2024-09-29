@@ -6,6 +6,8 @@ import Signup from './components/Signup';
 import Home from './components/Home';
 import ProtectedRoute from './components/ProtectedRoute';
 import Camera from './components/camera.jsx'
+import Questions from './components/Questions.jsx'
+
 function App() {
   
   {'Example Flashcard Carousel'}
