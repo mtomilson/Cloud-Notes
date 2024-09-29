@@ -1,6 +1,8 @@
 import React from 'react';
 import Modal from '@mui/material/Modal';
 import Camera from './camera';
+import { QuestionProvider } from './QuestionContext';
+import GenerateQuestion from './GenerateQuestion';
 
 const style = {
   position: 'absolute',
@@ -41,7 +43,10 @@ export default function OpenModal({ open, handleClose }) {
         >
           ✖
         </button>
-        <Camera />
+        <QuestionProvider>
+          <GenerateQuestion />
+          <Camera />
+        </QuestionProvider>
       </div>
     </Modal>
   );

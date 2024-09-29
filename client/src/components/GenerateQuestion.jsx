@@ -27,7 +27,7 @@ export default function GenerateQuestion() {
 
     if (!querySnapshot.empty) {
       const latestNote = querySnapshot.docs[0].data();
-      return latestNote.draft; // Assuming 'draft' contains the note content
+      return latestNote.content; // Assuming 'draft' contains the note content
     }
     return null;
   };
