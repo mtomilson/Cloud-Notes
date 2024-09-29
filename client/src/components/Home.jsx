@@ -62,6 +62,7 @@ const Home = () => {
         </button>
 
 
+
         <nav className="mt-5">
           <ul>
             <li className="p-2 hover:bg-gray-700 cursor-pointer">
@@ -88,7 +89,14 @@ const Home = () => {
         </div>
       </main>
     </div>
+<div className="p-4">
+                  <input type="file" multiple onChange={handleFileUpload} className="hidden" id="fileUpload"/>
+                  <label htmlFor="fileUpload" className="block p-2 bg-gray-700 hover:bg-gray-600 cursor-pointer text-center rounded">
+                      Upload Files
+                  </label>
+              </div>
   );
 };
+
 
 export default Home;
