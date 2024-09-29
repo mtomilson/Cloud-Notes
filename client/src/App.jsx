@@ -5,7 +5,7 @@ import Login from './components/Login';
 import Signup from './components/Signup';
 import Home from './components/Home';
 import ProtectedRoute from './components/ProtectedRoute';
-
+import Camera from './components/camera.jsx'
 function App() {
   
   {'Example Flashcard Carousel'}
@@ -22,21 +22,24 @@ function App() {
   // );
 
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route 
-          path="/home" 
-          element={
-            <ProtectedRoute>
-              <Home />
-            </ProtectedRoute>
-          } 
-        />
-      </Routes>
-    </Router>
+    // <Router>
+    //   <Routes>
+    //     <Route path="/" element={<LandingPage />} />
+    //     <Route path="/login" element={<Login />} />
+    //     <Route path="/signup" element={<Signup />} />
+    //     <Route 
+    //       path="/home" 
+    //       element={
+    //         <ProtectedRoute>
+    //           <Home />
+    //         </ProtectedRoute>
+    //       } 
+    //     />
+    //   </Routes>
+    // </Router>
+    <>
+    <Camera/>
+    </>
   );
 }
 
