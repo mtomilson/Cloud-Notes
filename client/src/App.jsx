@@ -8,6 +8,8 @@ import ProtectedRoute from './components/ProtectedRoute';
 import AgentChat from './components/AgentChat';
 import GenerateQuestion from './components/GenerateQuestion';
 import Camera from './components/camera.jsx'
+import Questions from './components/Questions.jsx'
+
 
 function App() {
   
