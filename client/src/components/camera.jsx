@@ -121,6 +121,22 @@ const App = () => {
   return (
     <div style={{ position: 'relative', height: '100vh', width: '100%' }}>
       {/* Video and Canvas */}
+      <button onClick={clearCanvas} style={{
+          position: 'relative',  // Keep the button stuck to the bottom of the viewport
+          top: '0',        // Align at the bottom
+          left: '225px',          // Align to the left side
+          zIndex: 9999,       // Make sure it's above other elements
+          backgroundColor: '#000',  // Example background color
+          color: 'white',     // White text for contrast
+          textAlign: 'center',
+          padding: '10px 20px', // Padding to make the button look good
+          fontSize: '18px',   // Adjust font size for readability
+          fontWeight: 'bold',
+          margin: '0',
+          border: 'none',     // Remove default button borders
+          borderRadius: '5px', // Optional: round the button corners
+          cursor: 'pointer',
+        }} >CLEAR</button>
       <div style={{ position: 'relative', width: '100%' }}>
         <video
           ref={videoRef}
@@ -148,23 +164,8 @@ const App = () => {
       <Questions canvasRef={canvasRef} />
 
       {/* Buttons */}
-      <button onClick={saveCanvas} style={{ position: 'absolute', top: '30px', left: '400px', zIndex: 9999 }}>SAVE</button>
-      <button onClick={clearCanvas} style={{
-          position: 'fixed',  // Keep the button stuck to the bottom of the viewport
-          top: '0',        // Align at the bottom
-          left: '295px',          // Align to the left side
-          zIndex: 9999,       // Make sure it's above other elements
-          backgroundColor: '#000',  // Example background color
-          color: 'white',     // White text for contrast
-          textAlign: 'center',
-          padding: '10px 20px', // Padding to make the button look good
-          fontSize: '18px',   // Adjust font size for readability
-          fontWeight: 'bold',
-          margin: '0',
-          border: 'none',     // Remove default button borders
-          borderRadius: '5px', // Optional: round the button corners
-          cursor: 'pointer',
-        }} >CLEAR</button>
+      {/* <button onClick={saveCanvas} style={{ position: 'absolute', top: '30px', left: '400px', zIndex: 9999 }}>SAVE</button> */}
+      
     </div>
   );
 };
