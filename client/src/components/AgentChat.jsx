@@ -15,7 +15,7 @@ export default function AgentChat() {
   useEffect(() => {
     const user = auth.currentUser;
     if (user) {
-      const messagesRef = collection(firestore, 'messages');
+      const messagesRef = collection(firestore, user.uid);
       const q = query(
         messagesRef,
         orderBy("timestamp", "asc")
@@ -73,7 +73,7 @@ export default function AgentChat() {
       setFiles([]);
 
       // Add user message to Firestore
-      await addDoc(collection(firestore, 'messages'), {
+      await addDoc(collection(firestore, user.uid), {
         content: message,
         sender: 'user',
         timestamp: new Date(),
@@ -99,15 +99,15 @@ export default function AgentChat() {
       setConversionResponse(aiResponse.draft);
 
       // Add AI response to Firestore
-      await addDoc(collection(firestore, 'messages'), {
+      await addDoc(collection(firestore, user.uid), {
         content: aiResponse.draft,
         sender: 'ai',
         timestamp: new Date(),
         userId: user.uid
       });
 
-      if (currentUser && currentUser.uid) {
-        const collectionRef = collection(firestore, currentUser.uid);
+      if (user && user.uid) {
+        const collectionRef = collection(firestore, user.uid);
         await addDoc(collectionRef, {
             draft: generateResult.draft,
             task: task,
@@ -122,24 +122,6 @@ export default function AgentChat() {
       setLoading(false);
     }
   };
-
-  // const processServerResponse = (data) => {
-  //   let responseContent = "";
-
-  //   if (data.generate && data.generate.draft) {
-  //     responseContent += data.generate.draft;
-  //   }
-
-  //   if (data.reflect && data.reflect.critique) {
-  //     responseContent += "\n\n### AI Reflection:\n" + data.reflect.critique;
-  //   }
-
-  //   if (data.research_plan && data.research_plan.content) {
-  //     responseContent += "\n\n### Research Notes:\n" + data.research_plan.content.join("\n");
-  //   }
-
-  //   return responseContent;
-  // };
 
   const handleFileUpload = (event) => {
     const selectedFiles = Array.from(event.target.files);

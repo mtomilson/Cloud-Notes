@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { signOut } from "firebase/auth";
 import { auth, firestore } from './../firebase';
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, query, orderBy, onSnapshot } from "firebase/firestore";
 import { useNavigate } from 'react-router-dom';
 import AgentChat from "./AgentChat";
 
@@ -12,8 +12,25 @@ const Home = () => {
     const [userEmail, setUserEmail] = useState('');
 
     useEffect(() => {
+        const user = auth.currentUser;
+        if (user) {
+          const messagesRef = collection(firestore, user.uid);
+          const q = query(
+            messagesRef,
+            orderBy("timestamp", "asc")
+          );
+    
+          const unsubscribe = onSnapshot(q, (snapshot) => {
+            const messages = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+          });
+    
+          return () => unsubscribe();
+        }
+      }, []);
+
+    useEffect(() => {
         const fetchNotes = async () => {
-            const notesCollection = collection(firestore, "notes");
+            const notesCollection = collection(firestore, auth.currentUser.uid);
             const notesSnapshot = await getDocs(notesCollection);
             const notesList = notesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             setNotes(notesList);
@@ -47,7 +64,7 @@ const Home = () => {
             {/* Title */}
             <header className="flex justify-between items-center p-4 text-white shadow-md">
                 <h1 className="text-3xl font-semibold">Cloud Notes</h1>
-                <img src="./hackUMBCTextShadow.png" alt="Logo" className="h-12" /> {/* Replace with your image path */}
+                <img src="./hackUMBCTextShadow.png" alt="Logo" className="h-12" />
             </header>
 
             {/* Main Content */}
@@ -62,7 +79,7 @@ const Home = () => {
 
                 {/* Footer */}
                 <footer className="flex justify-between items-center mt-4 text-gray-500">
-                    <img src="./hackLogo24.png" alt="Logo" className="h-8" /> {/* Replace with your image path */}
+                    <img src="./hackLogo24.png" alt="Logo" className="h-8" />
                     <button 
                         onClick={handleLogout} 
                         className="bg-red-500 text-white p-2 rounded hover:bg-red-600 transition"
