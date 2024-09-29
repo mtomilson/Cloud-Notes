@@ -9,7 +9,6 @@ const GoogleSignInButton = () => {
     const signInWithGoogle = async () => {
         try {
             const result = await signInWithPopup(auth, googleProvider);
-            console.log(result.user);
             // Redirect to home page after successful sign-in
             navigate('/home');
         } catch (error) {

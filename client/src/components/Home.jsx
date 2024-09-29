@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { signOut } from "firebase/auth";
-import { auth, db } from './../firebase';
+import { auth } from './../firebase';
 import { collection, addDoc, query, where, getDocs, deleteDoc, doc } from "firebase/firestore";
 import { useNavigate } from 'react-router-dom';
 
@@ -17,23 +17,23 @@ const Home = () => {
         });
     }
 
-    const handleFileUpload = async (event) => {
-        const uploadedFiles = Array.from(event.target.files);
-        const userId = auth.currentUser.uid;
+    // const handleFileUpload = async (event) => {
+    //     const uploadedFiles = Array.from(event.target.files);
+    //     const userId = auth.currentUser.uid;
         
-        for (let file of uploadedFiles) {
-            // Here you would typically upload the file to storage
-            // For this example, we'll just add metadata to Firestore
-            await addDoc(collection(db, "files"), {
-                name: file.name,
-                type: file.type,
-                size: file.size,
-                userId: userId,
-                folderId: currentFolder || "root",
-                uploadedAt: new Date()
-            });
-        }
-    }
+    //     for (let file of uploadedFiles) {
+    //         // Here you would typically upload the file to storage
+    //         // For this example, we'll just add metadata to Firestore
+    //         await addDoc(collection(db, "files"), {
+    //             name: file.name,
+    //             type: file.type,
+    //             size: file.size,
+    //             userId: userId,
+    //             folderId: currentFolder || "root",
+    //             uploadedAt: new Date()
+    //         });
+    //     }
+    // }
 
     return (
       <div className="flex h-screen">
