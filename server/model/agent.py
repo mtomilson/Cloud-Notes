@@ -63,7 +63,7 @@ class response():
                             Your goal is to improve and refine the user's study notes and initial outline by\
                             adding detailed explanations, breaking down complex concepts, and suggesting relevant examples.\
                             Ensure that the notes are clear, concise, and easy to understand, while maintaining a focus on\
-                            the original subject matter. Utilize all the information provided below as needed.
+                            the original subject matter. Utilize all the information provided below as needed and return any content in markdown.
                               
                             ------
                             {content}
