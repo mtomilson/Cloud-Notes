@@ -8,6 +8,7 @@ from pydantic import BaseModel
 from tavily import TavilyClient
 from flask import Flask, jsonify, request
 from flask_cors import CORS
+from openai import OpenAI
 import json
 import os
 import operator
@@ -20,6 +21,9 @@ _ = load_dotenv()
 
 # Configure a uuid for each conversation
 thread = {"configurable": {"thread_id": uuid.uuid4()}}
+
+# OpenAI Api Key
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 # Represents the state of an agent in the system, storing its current task, plan, draft, and other key attributes
 class AgentState(TypedDict):
@@ -225,6 +229,28 @@ def get_noyr_response():
         print(s)
         result.append(s)
     return jsonify(result)
+
+@app.route("/api/generate-problems", methods=['GET','POST'])
+def generate_problems():
+    notes = request.json.get('notes')
+    
+    problems = generate_problems_from_notes(notes)
+    
+    return jsonify({"problems": problems})
+
+def generate_problems_from_notes(notes):
+    completion = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {"role": "system", "content": "You are a teacher providing a student with additional practice problems based on their study notes."},
+            {
+                "role": "user",
+                "content": f"Based on these notes: '{notes}', generate 3 practice problems. For each problem, provide a detailed explanation on how to solve it. Format each problem and its explanation as a separate markdown section."
+            }
+        ]
+    )
+    
+    return completion.choices[0].message.content.split('\n\n')
 
 if __name__ == "__main__":
     app.run(debug=True, port=8080)

@@ -48,7 +48,11 @@ export default function AgentChat() {
 
       if (currentUser && currentUser.uid) {
         const collectionRef = collection(firestore, currentUser.uid);
-        await addDoc(collectionRef, { test: "test" });
+        await addDoc(collectionRef, {
+            draft: generateResult.draft,
+            task: task,
+            timestamp: new Date()
+          });
       } else {
         console.log("User is not authenticated or UID is not available");
       }
