@@ -245,12 +245,30 @@ def generate_problems_from_notes(notes):
             {"role": "system", "content": "You are a teacher providing a student with additional practice problems based on their study notes."},
             {
                 "role": "user",
-                "content": f"Based on these notes: '{notes}', generate 3 practice problems. For each problem, provide a detailed explanation on how to solve it. Format each problem and its explanation as a separate markdown section."
+                "content": f"Based on these notes: '{notes}', generate one practice problem. For the problem, provide only final the answer. Format it like this: 'Question: <question_text> Solution: <solution_text>'"
             }
         ]
     )
     
-    return completion.choices[0].message.content.split('\n\n')
+    # Get the response content
+    content = completion.choices[0].message.content
+    print("DEBUG: Model response content:", content)  # Add debug logging
+
+    # Check if the response has the expected format
+    if "Question:" in content and "Solution:" in content:
+        # Split into question and answer parts
+        question_part, answer_part = content.split("Solution:", 1)
+        question = question_part.replace("Question:", "").strip()
+        answer = answer_part.strip()
+        print(f"DEBUG: Extracted question: {question}")
+        print(f"DEBUG: Extracted answer: {answer}")
+        return {"question": question, "answer": answer}
+    else:
+        # Handle unexpected response format
+        print("ERROR: Response does not contain expected 'Question' and 'Solution' format.")
+        return {"question": "Unable to generate question", "answer": "Unable to generate answer due to unexpected response format."}
+
+
 
 if __name__ == "__main__":
     app.run(debug=True, port=8080)
