@@ -7,6 +7,7 @@ import Home from './components/Home';
 import ProtectedRoute from './components/ProtectedRoute';
 import AgentChat from './components/AgentChat';
 import GenerateQuestion from './components/GenerateQuestion';
+import Camera from './components/camera.jsx'
 
 function App() {
   

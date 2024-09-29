@@ -169,14 +169,37 @@ const App = () => {
   };
 
   return (
-    <div>
-      <video ref={videoRef} autoPlay style={{ position: 'absolute', top: 10, left: 50, zIndex: 0, transform: 'scaleX(-1)' }} />
+    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+      {/* Wrapper to center both the video and canvas */}
+      <div style={{ position: 'relative' }}>
+        {/* Video feed */}
+        <video
+          ref={videoRef}
+          autoPlay
+          style={{
+            width: '100%',
+            height: 'auto',
+            transform: 'scaleX(-1)', // Mirror the video feed
+          }}
+        />
 
-      <canvas ref={canvasRef} style={{ position: 'absolute', top: 10, left: 50, zIndex: 1 }} />
+        {/* Canvas for drawing */}
+        <canvas
+          ref={canvasRef}
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            pointerEvents: 'none', // Ensure only drawing happens, not interaction
+          }}
+        />
+      </div>
 
-      
-      <button onClick={saveCanvas} style={{position: 'absolute', top: "30px", left: '400px', zIndex: 9999}}>SAVE</button>
-      <button onClick={clearCanvas} style={{position: 'absolute', top: "30px", left: '700px', zIndex: 9999}}>CLEAR</button>
+      {/* Buttons */}
+      <button onClick={saveCanvas} style={{ position: 'absolute', top: '30px', left: '400px', zIndex: 9999 }}>SAVE</button>
+      <button onClick={clearCanvas} style={{ position: 'absolute', top: '30px', left: '700px', zIndex: 9999 }}>CLEAR</button>
     </div>
   );
 };
