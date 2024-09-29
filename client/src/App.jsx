@@ -14,6 +14,7 @@ import Questions from './components/Questions.jsx';
 function App() {
   
   // {'Example Flashcard Carousel'}
+
   // const flashcards = [
   //   { question: "What is the capital of France?", answer: "Paris" },
   //   { question: "What is 2 + 2?", answer: "4" },
@@ -32,13 +33,16 @@ function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        <Route 
-          path="/home" 
+        <Route
+          path="/home"
           element={
             <ProtectedRoute>
-              <Home />
+              {/* <Home /> */}
+              {/* <AgentChat />
+              <GenerateQuestion /> */}
+              <Home/>
             </ProtectedRoute>
-          } 
+          }
         />
       </Routes>
     </Router>

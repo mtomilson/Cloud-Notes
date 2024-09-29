@@ -1,4 +1,6 @@
-import React from 'react';
+import React, { useEffect, useState } from "react";
+import { useQuestionContext } from "./QuestionContext";
+import axios from "axios";
 
 const Questions = ({ canvasRef }) => {
     const saveCanvas = () => {
@@ -20,6 +22,7 @@ const Questions = ({ canvasRef }) => {
             </button>
         </div>
     );
+
 };
 
 export default Questions;
