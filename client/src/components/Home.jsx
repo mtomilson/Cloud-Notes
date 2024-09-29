@@ -5,7 +5,7 @@ import { collection, getDocs, query, orderBy, onSnapshot } from "firebase/firest
 import { useNavigate } from 'react-router-dom';
 import AgentChat from "./AgentChat";
 
-const Home = () => {
+const Home = () => { 
     const navigate = useNavigate();
     const [notes, setNotes] = useState([]);
     const [selectedNote, setSelectedNote] = useState(null);
