@@ -8,7 +8,7 @@ const App = () => {
   const detectorRef = useRef(null);
   const canvasRef = useRef(null);
   const eraserRef = useRef(null); // Ref for eraser image
-  console.log("eggoagjgjjsdj")
+
   let previousPoint = null; // Track the previous point for continuous drawing
 
   // Debug log for when erasing state changes
@@ -54,7 +54,7 @@ const App = () => {
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
     }
-
+    
     ctx.setTransform(1, 0, 0, 1, 0, 0); 
     if (detector && video.readyState === 4) {
       const hands = await detector.estimateHands(video, {
@@ -66,11 +66,18 @@ const App = () => {
         const middleFingerTip = hand.keypoints[12]; // Get the middle finger tip
 
         // Only turn on erasing mode if you hover over the eraser (don't reset to false)
-        checkErasing(middleFingerTip);
+        // checkErasing(middleFingerTip);
+
+        console.log(hand)
 
         // Detect if the hand is curled
-        const drawing = isDrawing(hand);  
-        const erasing = isErasing(hand)
+        const drawing = isDrawing(hand); 
+        console.log("Drawing: " + drawing+ " " + hand)
+
+
+        const erasing = isErasing(hand);
+        console.log("Erasing: " + erasing+ " " + hand)
+
 
         // Draw or erase depending on the current state
         drawLine(ctx, middleFingerTip, drawing, erasing);
@@ -82,38 +89,49 @@ const App = () => {
   };
 
   const isDrawing = (hand) => {
+    let distance = Math.abs(hand.keypoints[12].x - hand.keypoints[8].x);
+    
+    return (distance < 35) && (hand.keypoints[16].y > hand.keypoints[14].y);
+  };
+  
+  const isErasing = (hand) => {
     let distance1 = Math.abs(hand.keypoints[12].x - hand.keypoints[8].x);
     let distance2 = Math.abs(hand.keypoints[16].x - hand.keypoints[12].x)
-    console.log("d1: ", distance1, " d2: ", distance2)
-    return distance1 < 35 && distance2 < 35 && (hand.keypoints[16].y > hand.keypoints[13].y)
-  };
-
-  const isErasing = (hand) => {
-    let distance = Math.abs(hand.keypoints[12].x - hand.keypoints[8].x);
-    console.log(distance)
-    
-    return (distance < 35) && (hand.keypoints[16].y < hand.keypoints[13].y);
+    return distance1 < 40 && distance2 < 35 && (hand.keypoints[16].y < hand.keypoints[14].y)
 
   }
 
 
-  // Check if middle finger is over the eraser (Only set to true, no reset to false)
-  const checkErasing = (middleFingerTip) => {
-    const eraserElement = eraserRef.current;
-    if (eraserElement) {
-      const rect = eraserElement.getBoundingClientRect();
-      const fingerX = middleFingerTip.x;
-      const fingerY = middleFingerTip.y;
+  // // Check if middle finger is over the eraser (Only set to true, no reset to false)
+  // const checkErasing = (middleFingerTip) => {
+  //   const eraserElement = eraserRef.current;
+  //   if (eraserElement) {
+  //     const rect = eraserElement.getBoundingClientRect();
+  //     const fingerX = middleFingerTip.x;
+  //     const fingerY = middleFingerTip.y;
 
-      // If the finger is over the eraser, permanently switch to erasing mode
-      if (fingerX >= rect.left && fingerX <= rect.right && fingerY >= rect.top && fingerY <= rect.bottom) {
-       return true
-      }
-      else {
-        return false
-      }
-    }
-  };
+  //     // If the finger is over the eraser, permanently switch to erasing mode
+  //     if (fingerX >= rect.left && fingerX <= rect.right && fingerY >= rect.top && fingerY <= rect.bottom) {
+  //      return true
+  //     }
+  //     else {
+  //       return false
+  //     }
+  //   }
+  // };
+
+  const saveCanvas = () => {
+    const canvas = canvasRef.current
+    const image = canvas.toDataURL("image/png")
+    console.log(image)
+
+  }
+
+  const clearCanvas = () => {
+    const canvas = canvasRef.current
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
 
   const drawLine = (ctx, point, drawing, erasing) => {
     if (!isNaN(point.x) && !isNaN(point.y)) {
@@ -152,21 +170,13 @@ const App = () => {
 
   return (
     <div>
-      {/* Video feed (zIndex: 0) */}
       <video ref={videoRef} autoPlay style={{ position: 'absolute', top: 10, left: 50, zIndex: 0, transform: 'scaleX(-1)' }} />
 
-      {/* Canvas for drawing (zIndex: 1) to stay on top of the video */}
       <canvas ref={canvasRef} style={{ position: 'absolute', top: 10, left: 50, zIndex: 1 }} />
 
-      {/* Eraser Image */}
-      <img
-        ref={eraserRef}
-        src={eraser}
-        width="200"
-        height="100"
-        style={{ position: 'absolute', top: '30px', left: '700px', zIndex: 9999 }}
-        alt="eraser"
-      />
+      
+      <button onClick={saveCanvas} style={{position: 'absolute', top: "30px", left: '400px', zIndex: 9999}}>SAVE</button>
+      <button onClick={clearCanvas} style={{position: 'absolute', top: "30px", left: '700px', zIndex: 9999}}>CLEAR</button>
     </div>
   );
 };
