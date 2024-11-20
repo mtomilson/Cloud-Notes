@@ -27,7 +27,7 @@ const Signup = () => {
         <main className="flex bg-custom-gradient items-center justify-center min-h-screen">
             <section className="w-full max-w-md p-6 bg-white rounded-lg shadow-md">
                 <div>
-                    <h1 className="text-2xl font-bold text-center text-deep-purple mb-6"> Implement App </h1> 
+                    <h1 className="text-2xl font-bold text-center text-deep-purple mb-6"> Cloud Notes</h1> 
                     <form onSubmit={onSubmit}>
                         <div className="mb-4">
                             <label htmlFor="email-address" className="block text-sm font-medium text-deep-purple">

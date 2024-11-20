@@ -8,11 +8,17 @@ from pydantic import BaseModel
 from tavily import TavilyClient
 from flask import Flask, jsonify, request
 from flask_cors import CORS
+from openai import OpenAI
 import json
 import os
 import operator
 import sqlite3
 import uuid
+from werkzeug.utils import secure_filename
+import PyPDF2
+import docx
+import speech_recognition as sr
+from pydub import AudioSegment
 
 
 # Initialize dotenv to load environment variables
@@ -20,6 +26,9 @@ _ = load_dotenv()
 
 # Configure a uuid for each conversation
 thread = {"configurable": {"thread_id": uuid.uuid4()}}
+
+# OpenAI Api Key
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 # Represents the state of an agent in the system, storing its current task, plan, draft, and other key attributes
 class AgentState(TypedDict):
@@ -63,7 +72,7 @@ class response():
                             Your goal is to improve and refine the user's study notes and initial outline by\
                             adding detailed explanations, breaking down complex concepts, and suggesting relevant examples.\
                             Ensure that the notes are clear, concise, and easy to understand, while maintaining a focus on\
-                            the original subject matter. Utilize all the information provided below as needed.
+                            the original subject matter. Utilize all the information provided below as needed and return any content in markdown.
                               
                             ------
                             {content}
@@ -206,6 +215,78 @@ app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": "http://localhost:5173", "supports_credentials": True}})
 
 response_instance = response()
+UPLOAD_FOLDER = 'temp_uploads'
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
+
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+def extract_text_from_pdf(file_path):
+    with open(file_path, 'rb') as file:
+        reader = PyPDF2.PdfReader(file)
+        text = ""
+        for page in reader.pages:
+            text += page.extract_text() + "\n"
+    return text
+
+def extract_text_from_docx(file_path):
+    doc = docx.Document(file_path)
+    text = ""
+    for para in doc.paragraphs:
+        text += para.text + "\n"
+    return text
+
+def extract_text_from_audio(file_path):
+    r = sr.Recognizer()
+    
+    # Convert audio to WAV format
+    audio = AudioSegment.from_file(file_path)
+    wav_path = file_path + ".wav"
+    audio.export(wav_path, format="wav")
+    
+    with sr.AudioFile(wav_path) as source:
+        audio_data = r.record(source)
+        text = r.recognize_google(audio_data)
+    
+    os.remove(wav_path)  # Clean up temporary WAV file
+    return text
+
+@app.route("/api/convert-files", methods=['POST'])
+def convert_files():
+    if 'file0' not in request.files:
+        return jsonify({"error": "No file part"}), 400
+    
+    files = request.files.to_dict(flat=False)
+    converted_texts = []
+
+    for file_key in files:
+        file = files[file_key][0]
+        if file.filename == '':
+            continue
+        
+        if file:
+            filename = secure_filename(file.filename)
+            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            file.save(file_path)
+            
+            try:
+                if file.content_type == 'application/pdf':
+                    text = extract_text_from_pdf(file_path)
+                elif file.content_type in ['application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document']:
+                    text = extract_text_from_docx(file_path)
+                elif file.content_type.startswith('audio/'):
+                    text = extract_text_from_audio(file_path)
+                else:
+                    with open(file_path, 'r') as f:
+                        text = f.read()
+                
+                converted_texts.append(f"[Content of {filename}]:\n{text}")
+            except Exception as e:
+                print(f"[Error processing {filename}]: {str(e)}")
+            finally:
+                os.remove(file_path)  # Clean up the uploaded file
+
+    return jsonify(converted_texts)
 
 @app.route("/api/note-response", methods=['GET', 'POST'])
 def get_noyr_response():
@@ -224,7 +305,49 @@ def get_noyr_response():
     }, thread):
         print(s)
         result.append(s)
-    return jsonify(result)
+        answer = jsonify(result)
+        print(answer)
+    return answer
+
+@app.route("/api/generate-problems", methods=['GET','POST'])
+def generate_problems():
+    notes = request.json.get('notes')
+    
+    problems = generate_problems_from_notes(notes)
+    
+    return jsonify({"problems": problems})
+
+def generate_problems_from_notes(notes):
+    completion = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {"role": "system", "content": "You are a teacher providing a student with additional practice problems based on their study notes."},
+            {
+                "role": "user",
+                "content": f"Based on these notes: '{notes}', generate one practice problem. For the problem, provide only final the answer. Format it like this: 'Question: <question_text> Solution: <solution_text>'"
+            }
+        ]
+    )
+    
+    # Get the response content
+    content = completion.choices[0].message.content
+    print("DEBUG: Model response content:", content)  # Add debug logging
+
+    # Check if the response has the expected format
+    if "Question:" in content and "Solution:" in content:
+        # Split into question and answer parts
+        question_part, answer_part = content.split("Solution:", 1)
+        question = question_part.replace("Question:", "").strip()
+        answer = answer_part.strip()
+        print(f"DEBUG: Extracted question: {question}")
+        print(f"DEBUG: Extracted answer: {answer}")
+        return {"question": question, "answer": answer}
+    else:
+        # Handle unexpected response format
+        print("ERROR: Response does not contain expected 'Question' and 'Solution' format.")
+        return {"question": "Unable to generate question", "answer": "Unable to generate answer due to unexpected response format."}
+
+
 
 if __name__ == "__main__":
     app.run(debug=True, port=8080)
